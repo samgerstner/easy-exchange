@@ -1,0 +1,39 @@
+<!-- Application Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" th:href="@{/home}"><p th:text="${appTitle}"></p></a>
+  <ul class="navbar-nav mr-auto">
+    <li class="nav-item">
+      <a class="nav-link" th:href="@{/home}">Home</a>
+    </li>
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" id="clientDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
+        Clients
+      </a>
+      <div class="dropdown-menu" aria-labelledby="clientDropdown" >
+        <a class="dropdown-item" th:href="@{/clients/create}">Create Client</a>
+        <a class="dropdown-item" th:href="@{/clients/view}">View/Search Clients</a>
+      </div>
+    </li>
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" id="productDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
+        Clients
+      </a>
+      <div class="dropdown-menu" aria-labelledby="productDropdown">
+        <a class="dropdown-item" th:href="@{/products/create}">Create Product</a>
+        <a class="dropdown-item" th:href="@{/products/view}">View/Search Products</a>
+      </div>
+    </li>
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" id="keyDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
+        Clients
+      </a>
+      <div class="dropdown-menu" aria-labelledby="keyDropdown">
+        <a class="dropdown-item" th:href="@{/product-keys/create}">Create Product Key</a>
+        <a class="dropdown-item" th:href="@{product-keys/view}">View/Search Product Keys</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" th:href="@{/verify}">Verify Product Key</a>
+    </li>
+  </ul>
+</nav>
