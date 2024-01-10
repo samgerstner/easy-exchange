@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,12 @@ public class UploadSessionController
 
    @Autowired
    private UploadSessionRepository sessionRepo;
+
+   @ResponseStatus(HttpStatus.BAD_REQUEST)
+   public String badRequest()
+   {
+      return "Bad request";
+   }
 
    @GetMapping(value = "/create")
    public String getCreate(Model model)
@@ -49,7 +57,7 @@ public class UploadSessionController
 
       if(sessionOptional.isEmpty())
       {
-         return "HTTP/1.1 400 Bad Request";
+         return "redirect:/upload-sessions/bad-request";
       }
 
       model.addAttribute("appTitle", title);
@@ -64,7 +72,7 @@ public class UploadSessionController
 
       if(sessionOptional.isEmpty())
       {
-         return "HTTP/1.1 400 Bad Request";
+         return "redirect:/upload-sessions/bad-request";
       }
 
       UploadSession session = sessionOptional.get();
@@ -117,7 +125,7 @@ public class UploadSessionController
 
       if(clientOptional.isEmpty())
       {
-         return "HTTP/1.1 400 Bad Request";
+         return "redirect:/upload-sessions/bad-request";
       }
 
       model.addAttribute("appTitle", title);
@@ -132,7 +140,7 @@ public class UploadSessionController
 
       if(clientOptional.isEmpty())
       {
-         return "HTTP/1.1 400 Bad Request";
+         return "redirect:/upload-sessions/bad-request";
       }
 
       sessionRepo.deleteById(guid);
