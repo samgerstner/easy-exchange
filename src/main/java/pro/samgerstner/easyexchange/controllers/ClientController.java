@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,12 @@ public class ClientController
 
    @Autowired
    private ClientRepository clientRepo;
+
+   @ResponseStatus(HttpStatus.BAD_REQUEST)
+   public String badRequest()
+   {
+      return "Bad request";
+   }
 
    @GetMapping(value = "/create")
    public String getCreate(Model model)
@@ -47,7 +54,7 @@ public class ClientController
 
       if(clientOptional.isEmpty())
       {
-         return "HTTP/1.1 400 Bad Request";
+         return "redirect:/clients/bad-request";
       }
 
       model.addAttribute("appTitle", title);
@@ -62,7 +69,7 @@ public class ClientController
 
       if(clientOptional.isEmpty())
       {
-         return "HTTP/1.1 400 Bad Request";
+         return "redirect:/clients/bad-request";
       }
 
       Client client = clientOptional.get();
@@ -115,7 +122,7 @@ public class ClientController
 
       if(clientOptional.isEmpty())
       {
-         return "HTTP/1.1 400 Bad Request";
+         return "redirect:/clients/bad-request";
       }
 
       model.addAttribute("appTitle", title);
@@ -130,7 +137,7 @@ public class ClientController
 
       if(clientOptional.isEmpty())
       {
-         return "HTTP/1.1 400 Bad Request";
+         return "redirect:/clients/bad-request";
       }
 
       clientRepo.deleteById(id);
