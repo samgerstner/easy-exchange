@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title th:text="${appTitle} + ' | View Documents'"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link th:replace="~{fragments/dependencies.html}" />
+  </head>
+  <body>
+    <div th:replace="~{fragments/navigation.html}"></div>
+    <h2>View/Search Documents</h2>
+
+    <div>
+      <form th:action="@{/documents/view}" id="searchForm">
+        <div class="row d-flex">
+          <div class="col-md-6 mt-2">
+            <div class="search">
+              <i class="fa fa-search"></i>
+              <input id="search" type="search" name="search" th:value="${search}" required class="form-control"
+                     placeholder="Enter search">
+              <button type="submit" class="btn btn-secondary">Search</button>
+            </div>
+          </div>
+          <div class="col-md-3 input-group mt-2">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="pageSize">Items per page:</label>
+            </div>
+            <select form="searchForm" name="size" th:value="${pageSize}" onchange="changePageSize()" class="size-select"
+                    id="pageSize">
+              <option th:each="s : ${ {5, 10, 15, 20, 25, 50, 100, 250} }" th:value="${s}" th:text="${s}" th:selected="${s == pageSize}"></option>
+            </select>
+          </div>
+          <div class="col-md-1 mt-2">
+            <button id="btnClear" class="btn btn-info">Clear</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div th:if="${docs.size() > 0}">
+      <table class="table table-hover table-responsive-xl">
+        <thead class="thead-dark">
+        <tr>
+          <th th:replace="~{fragments/document_sorting :: sorting('guid', 'GUID')}"></th>
+          <th th:replace="~{fragments/document_sorting :: sorting('fileName', 'File Name')}"></th>
+          <th th:replace="~{fragments/document_sorting :: sorting('fileType', 'File Type')}"></th>
+          <th th:replace="~{fragments/document_sorting :: sorting('sessionGuid', 'Upload Session GUID')}"></th>
+          <th th:replace="~{fragments/document_sorting :: sorting('uploadedAt', 'Uploaded Timestamp')}"></th>
+          <th th:replace="~{fragments/document_sorting :: sorting('clientEmail', 'Client Email')}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="doc : ${docs}">
+          <th scope="row">[[${client.id}]]</th>
+          <td>[[${doc.fileName}]]</td>
+          <td>[[${doc.fileType}]]</td>
+          <td>[[${doc.uploadSession.guid}]]</td>
+          <td>[[${doc.uploadedAt}]]</td>
+          <td>[[${doc.uploadSession.client.email}]]</td>
+          <td>
+            <a th:href="@{'/documents/admin-download?guid=' + ${doc.guid} + '&nonce=' + ${doc.downloadNonce}}" title="Download this document"
+               class="fa-regular fa-file-arrow-down icon-dark" target="_blank"></a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div th:unless="${docs.size() > 0}">
+      <span>No documents found!</span>
+    </div>
+
+    <nav aria-label="Pagination" th:if="${totalPages > 0}">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+          <a th:replace="~{fragments/document_paging :: paging(1, '<<', 'First Page')}"></a>
+        </li>
+        <li class="page-item font-weight-bold" th:classappend="${currentPage == 1} ? 'disabled'">
+          <a th:replace="~{fragments/document_paging :: paging(${currentPage - 1}, 'Prev', 'Previous Page')}"></a>
+        </li>
+        <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
+          <a class="page-link" href="#">...</a>
+        </li>
+        <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
+            th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
+          <a th:replace="~{fragments/document_paging :: paging(${page}, ${page}, 'Page ' + ${page})}"></a>
+        </li>
+        <li class="page-item disabled" th:if="${currentPage + 2 < totalPages}">
+          <a class="page-link" href="#">...</a>
+        </li>
+        <li class="page-item font-weight-bold" th:classappend="${currentPage == totalPages} ? 'disabled'">
+          <a th:replace="~{fragments/document_paging :: paging(${currentPage + 1},'Next', 'Next Page')}"></a>
+        </li>
+        <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+          <a th:replace="~{fragments/document_paging :: paging(${totalPages}, '>>', 'Last Page')}"></a>
+        </li>
+      </ul>
+    </nav>
+  </body>
+</html>
