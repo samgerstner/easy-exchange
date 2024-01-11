@@ -7,13 +7,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import pro.samgerstner.easyexchange.S3Helper;
 import pro.samgerstner.easyexchange.entities.UploadSession;
 import pro.samgerstner.easyexchange.entities.repositories.UploadSessionRepository;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,6 +45,8 @@ public class UploadSessionController
    public String postCreate(@ModelAttribute UploadSession session)
    {
       session.setGuid(UUID.randomUUID().toString());
+      S3Helper s3 = new S3Helper();
+      s3.createUploadSessionFolder(session.getGuid());
       sessionRepo.save(session);
       return "redirect:/upload-sessions/view";
    }
@@ -143,6 +144,8 @@ public class UploadSessionController
          return "redirect:/upload-sessions/bad-request";
       }
 
+      S3Helper s3 = new S3Helper();
+      s3.deleteUploadSessionFolder(guid);
       sessionRepo.deleteById(guid);
       return "redirect:/upload-sessions/view";
    }
