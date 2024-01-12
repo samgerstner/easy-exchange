@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:text="${appTitle} + ' | Download Document'"></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link th:replace="~{fragments/dependencies.html}" />
+    </head>
+    <body>
+        <div th:replace="~{fragments/public_navigation.html}"></div>
+        <h2>Download Document</h2>
+        <div class="alert alert-danger" role="alert" th:unless="${errorMsg.length() > 0}" th:text="${errorMsg}"></div>
+        <form action="#" th:action="@{/download}" th:object="${downloadReq}" method="post">
+            <div class="form-group">
+                <label for="docGuid">Document GUID:</label>
+                <input type="text" id="docGuid" class="form-control" placeholder="Document GUID" th:field="*{docGUID}" th:value="${downloadReq.getDocGUID()}" required>
+            </div>
+            <div class="form-group">
+                <label for="sessionGuid">Upload Session GUID:</label>
+                <input type="text" id="sessionGuid" class="form-control" placeholder="Upload Session GUID" th:field="*{sessionGUID}" th:value="${downloadReq.getSessionGUID()}" required>
+            </div>
+            <div class="form-group">
+                <label for="clientEmail">Client Email:</label>
+                <input type="email" id="clientEmail" class="form-control" placeholder="Client Email" th:field="*{clientEmail}" th:value="${downloadReq.getClientEmail()}" required>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Download File</button>
+                <button type="reset" class="btn btn-secondary">Reset</button>
+            </div>
+        </form>
+    </body>
+</html>

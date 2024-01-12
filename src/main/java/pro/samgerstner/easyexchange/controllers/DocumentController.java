@@ -13,12 +13,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import pro.samgerstner.easyexchange.S3Helper;
 import pro.samgerstner.easyexchange.entities.Document;
 import pro.samgerstner.easyexchange.entities.repositories.DocumentRepository;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -88,5 +90,35 @@ public class DocumentController
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.parseMediaType(doc.getFileType()));
       return new ResponseEntity<>(responseBody, headers, HttpStatus.OK);
+   }
+
+   @GetMapping(value = "/puublic-download")
+   public ResponseEntity<byte[]> publicDownload(@RequestHeader Map<String, String> headers)
+   {
+      //Verify required headers exist
+      if(!headers.containsKey("X-Document-GUID") || !headers.containsKey("X-Download-Nonce"))
+      {
+         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+
+      //Get document from the repo
+      Optional<Document> docOptional = docRepo.findById(headers.get("X-Document-GUID"));
+      if(docOptional.isEmpty())
+      {
+         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+      Document doc = docOptional.get();
+
+      //Verify the download nonce matches
+      if(!doc.getDownloadNonce().equals(headers.get("X-Download-Nonce")))
+      {
+         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+
+      S3Helper s3 = new S3Helper();
+      byte[] responseBody = s3.downloadSessionFile(doc.getUploadSession().getGuid(), doc.getFileName());
+      HttpHeaders responseHeaders = new HttpHeaders();
+      responseHeaders.setContentType(MediaType.parseMediaType(doc.getFileType()));
+      return new ResponseEntity<>(responseBody, responseHeaders, HttpStatus.OK);
    }
 }
