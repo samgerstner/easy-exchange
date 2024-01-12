@@ -1,6 +1,5 @@
 package pro.samgerstner.easyexchange;
 
-import org.springframework.beans.factory.annotation.Value;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -23,7 +22,10 @@ public class S3Helper
 
    public S3Helper(String accessKey, String secretKey, String region, String bucketName)
    {
-      System.out.printf("%s/%s", this.accessKey, this.secretKey);
+      this.accessKey = accessKey;
+      this.secretKey = secretKey;
+      this.region = region;
+      this.bucketName = bucketName;
       credentials = AwsBasicCredentials.create(this.accessKey, this.secretKey);
       AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(this.credentials);
       Region awsRegion = Region.of(this.region);
