@@ -1,9 +1,12 @@
 package pro.samgerstner.easyexchange.entities;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class UploadRequest
 {
    private String sessionGUID;
    private String clientEmail;
+   private MultipartFile file;
 
    public String getSessionGUID()
    {
@@ -23,5 +26,15 @@ public class UploadRequest
    public void setClientEmail(String clientEmail)
    {
       this.clientEmail = clientEmail;
+   }
+
+   public MultipartFile getFile()
+   {
+      return file;
+   }
+
+   public void setFile(MultipartFile file)
+   {
+      this.file = file;
    }
 }

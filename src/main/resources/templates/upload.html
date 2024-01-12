@@ -8,8 +8,8 @@
     <body>
         <div th:replace="~{fragments/public_navigation.html}"></div>
         <h2>Upload Document</h2>
-        <div class="alert alert-danger" role="alert" th:unless="${errorMsg.length() > 0}" th:text="${errorMsg}"></div>
-        <div class="alert alert-success" role="alert" th:unless="${uploadSuccess}">File uploaded successfully.</div>
+        <div class="alert alert-danger" role="alert" th:if="${errorMsg.length() > 0}"></div>
+        <div class="alert alert-success" role="alert" th:if="${uploadSuccess}">File uploaded successfully.</div>
         <form action="#" th:action="@{/upload}" th:object="${uploadReq}" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="sessionGuid">Upload Session GUID:</label>

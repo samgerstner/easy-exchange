@@ -109,11 +109,12 @@ public class PublicController
       model.addAttribute("appTitle", title);
       model.addAttribute("uploadReq", new UploadRequest());
       model.addAttribute("errorMsg", "");
+      model.addAttribute("uploadSuccess", false);
       return "upload";
    }
 
    @PostMapping(value = "/upload")
-   public String postUpload(@ModelAttribute UploadRequest req, @RequestParam("file") MultipartFile file, Model model) throws IOException
+   public String postUpload(@ModelAttribute UploadRequest req, Model model) throws IOException
    {
       //Verify session exists
       Optional<UploadSession> sessionOptional = sessionRepo.findById(req.getSessionGUID());
@@ -149,13 +150,13 @@ public class PublicController
 
       //Upload document to S3
       S3Helper s3 = new S3Helper(accessKey, secretKey, region, bucketName);
-      s3.uploadSessionFile(req.getSessionGUID(), file.getName(), file.getBytes());
+      s3.uploadSessionFile(req.getSessionGUID(), req.getFile().getName(), req.getFile().getBytes());
 
       //Build document object
       Document newDoc = new Document();
       newDoc.setGuid(UUID.randomUUID().toString());
-      newDoc.setFileName(file.getName());
-      newDoc.setFileType(file.getContentType());
+      newDoc.setFileName(req.getFile().getName());
+      newDoc.setFileType(req.getFile().getContentType());
       newDoc.setUploadedAt(new SimpleDateFormat("MM-dd-yyyy HH:mm").format(new Date()));
       newDoc.setDownloadNonce(s3.generateDownloadNonce());
       docRepo.save(newDoc);
