@@ -11,6 +11,8 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
+import java.util.Random;
+
 public class S3Helper
 {
    @Value("${aws.access-key}")
@@ -71,5 +73,20 @@ public class S3Helper
       String completeFileName = sessionGUID + "/" + fileName;
       DeleteObjectRequest req = DeleteObjectRequest.builder().bucket(this.bucketName).key(completeFileName).build();
       return this.client.deleteObject(req);
+   }
+
+   public String generateDownloadNonce()
+   {
+      String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      StringBuilder builder = new StringBuilder();
+      Random random = new Random();
+
+      while(builder.length() < 32)
+      {
+         int index = (int) (random.nextFloat() * chars.length());
+         builder.append(chars.charAt(index));
+      }
+
+      return builder.toString();
    }
 }
