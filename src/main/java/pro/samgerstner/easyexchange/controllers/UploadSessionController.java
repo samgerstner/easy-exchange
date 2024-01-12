@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pro.samgerstner.easyexchange.S3Helper;
 import pro.samgerstner.easyexchange.entities.UploadSession;
+import pro.samgerstner.easyexchange.entities.repositories.ClientRepository;
 import pro.samgerstner.easyexchange.entities.repositories.UploadSessionRepository;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,9 @@ public class UploadSessionController
    @Autowired
    private UploadSessionRepository sessionRepo;
 
+   @Autowired
+   private ClientRepository clientRepo;
+
    @ResponseStatus(HttpStatus.BAD_REQUEST)
    public String badRequest()
    {
@@ -38,6 +42,7 @@ public class UploadSessionController
    {
       model.addAttribute("appTitle", title);
       model.addAttribute("us", new UploadSession());
+      model.addAttribute("clients", clientRepo.findAll());
       return "session_create";
    }
 
@@ -63,6 +68,7 @@ public class UploadSessionController
 
       model.addAttribute("appTitle", title);
       model.addAttribute("us", sessionOptional.get());
+      model.addAttribute("clients", clientRepo.findAll());
       return "session_edit";
    }
 
