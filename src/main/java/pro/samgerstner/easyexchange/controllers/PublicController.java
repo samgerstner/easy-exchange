@@ -77,6 +77,15 @@ public class PublicController
          return "download";
       }
 
+      //Verify that download is not locked
+      if(doc.getUploadSession().isDownloadLocked())
+      {
+         model.addAttribute("appTitle", title);
+         model.addAttribute("downloadReq", req);
+         model.addAttribute("errorMsg", "File download is not allowed at this time. Please contact your administrator.");
+         return "download";
+      }
+
       response.addHeader("X-Document-GUID", doc.getGuid());
       response.addHeader("X-Download-Nonce", doc.getDownloadNonce());
       return "redirect:/documents/public-download";
@@ -112,6 +121,16 @@ public class PublicController
          model.addAttribute("appTitle", title);
          model.addAttribute("uploadReq", req);
          model.addAttribute("errorMsg", "The provided client email does not match our records.");
+         model.addAttribute("uploadSuccess", false);
+         return "upload";
+      }
+
+      //Verify that upload is not locked
+      if(session.isUploadLocked())
+      {
+         model.addAttribute("appTitle", title);
+         model.addAttribute("uploadReq", req);
+         model.addAttribute("errorMsg", "File upload is not allowed at this time. Please contact your administrator.");
          model.addAttribute("uploadSuccess", false);
          return "upload";
       }
