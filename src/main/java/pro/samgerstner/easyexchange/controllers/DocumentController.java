@@ -6,14 +6,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import pro.samgerstner.easyexchange.S3Helper;
 import pro.samgerstner.easyexchange.entities.Document;
 import pro.samgerstner.easyexchange.entities.repositories.DocumentRepository;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(value = "/documents")
@@ -58,5 +64,29 @@ public class DocumentController
       model.addAttribute("sortDirection", sortDirection);
       model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");
       return "document_view";
+   }
+
+   @GetMapping(value = "/admin-download")
+   public ResponseEntity<byte[]> adminDownload(@RequestParam String guid, @RequestParam String nonce)
+   {
+
+      Optional<Document> docOptional = docRepo.findById(guid);
+      if(docOptional.isEmpty())
+      {
+         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+
+      Document doc = docOptional.get();
+
+      if(!doc.getDownloadNonce().equals(nonce))
+      {
+         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+
+      S3Helper s3 = new S3Helper();
+      byte[] responseBody = s3.downloadSessionFile(doc.getUploadSession().getGuid(), doc.getFileName());
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.parseMediaType(doc.getFileType()));
+      return new ResponseEntity<>(responseBody, headers, HttpStatus.OK);
    }
 }
