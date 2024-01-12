@@ -36,6 +36,18 @@ public class PublicController
    @Autowired
    private UploadSessionRepository sessionRepo;
 
+   @Value("${aws.access-key}")
+   private String accessKey;
+
+   @Value("${aws.secret-key}")
+   private String secretKey;
+
+   @Value("${aws.region}")
+   private String region;
+
+   @Value("${aws.bucket-name}")
+   private String bucketName;
+
    @GetMapping(value = "download")
    public String getDownload(Model model)
    {
@@ -136,7 +148,7 @@ public class PublicController
       }
 
       //Upload document to S3
-      S3Helper s3 = new S3Helper();
+      S3Helper s3 = new S3Helper(accessKey, secretKey, region, bucketName);
       s3.uploadSessionFile(req.getSessionGUID(), file.getName(), file.getBytes());
 
       //Build document object

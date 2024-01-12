@@ -10,32 +10,23 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
-
 import java.util.Random;
 
 public class S3Helper
 {
-   @Value("${aws.access-key}")
    private String accessKey;
-
-   @Value("${aws.secret-key}")
    private String secretKey;
-
-   @Value("${aws.region}")
    private String region;
-
-   @Value("${aws.bucket-name}")
    private String bucketName;
-
    private AwsCredentials credentials;
-
    private S3Client client;
 
-   public S3Helper()
+   public S3Helper(String accessKey, String secretKey, String region, String bucketName)
    {
+      System.out.printf("%s/%s", this.accessKey, this.secretKey);
+      credentials = AwsBasicCredentials.create(this.accessKey, this.secretKey);
       AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(this.credentials);
       Region awsRegion = Region.of(this.region);
-      credentials = AwsBasicCredentials.create(this.accessKey, this.secretKey);
       client = S3Client.builder().credentialsProvider(credentialsProvider).region(awsRegion).build();
    }
 

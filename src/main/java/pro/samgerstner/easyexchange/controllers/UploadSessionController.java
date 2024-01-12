@@ -31,6 +31,18 @@ public class UploadSessionController
    @Autowired
    private ClientRepository clientRepo;
 
+   @Value("${aws.access-key}")
+   private String accessKey;
+
+   @Value("${aws.secret-key}")
+   private String secretKey;
+
+   @Value("${aws.region}")
+   private String region;
+
+   @Value("${aws.bucket-name}")
+   private String bucketName;
+
    @ResponseStatus(HttpStatus.BAD_REQUEST)
    public String badRequest()
    {
@@ -50,7 +62,7 @@ public class UploadSessionController
    public String postCreate(@ModelAttribute UploadSession session)
    {
       session.setGuid(UUID.randomUUID().toString());
-      S3Helper s3 = new S3Helper();
+      S3Helper s3 = new S3Helper(accessKey, secretKey, region, bucketName);
       s3.createUploadSessionFolder(session.getGuid());
       sessionRepo.save(session);
       return "redirect:/upload-sessions/view";
@@ -150,7 +162,7 @@ public class UploadSessionController
          return "redirect:/upload-sessions/bad-request";
       }
 
-      S3Helper s3 = new S3Helper();
+      S3Helper s3 = new S3Helper(accessKey, secretKey, region, bucketName);
       s3.deleteUploadSessionFolder(guid);
       sessionRepo.deleteById(guid);
       return "redirect:/upload-sessions/view";

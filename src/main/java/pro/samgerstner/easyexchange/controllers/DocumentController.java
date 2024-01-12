@@ -33,6 +33,18 @@ public class DocumentController
    @Autowired
    private DocumentRepository docRepo;
 
+   @Value("${aws.access-key}")
+   private String accessKey;
+
+   @Value("${aws.secret-key}")
+   private String secretKey;
+
+   @Value("${aws.region}")
+   private String region;
+
+   @Value("${aws.bucket-name}")
+   private String bucketName;
+
    @GetMapping(value = "/view")
    public String view(@RequestParam(required = false) String search, @RequestParam(defaultValue = "1") int page,
                       @RequestParam(defaultValue = "20") int size, @RequestParam(defaultValue = "id,asc") String[] sort,
@@ -85,7 +97,7 @@ public class DocumentController
          return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
       }
 
-      S3Helper s3 = new S3Helper();
+      S3Helper s3 = new S3Helper(accessKey, secretKey, region, bucketName);
       byte[] responseBody = s3.downloadSessionFile(doc.getUploadSession().getGuid(), doc.getFileName());
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.parseMediaType(doc.getFileType()));
@@ -115,7 +127,7 @@ public class DocumentController
          return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
       }
 
-      S3Helper s3 = new S3Helper();
+      S3Helper s3 = new S3Helper(accessKey, secretKey, region, bucketName);
       byte[] responseBody = s3.downloadSessionFile(doc.getUploadSession().getGuid(), doc.getFileName());
       HttpHeaders responseHeaders = new HttpHeaders();
       responseHeaders.setContentType(MediaType.parseMediaType(doc.getFileType()));
