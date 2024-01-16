@@ -1,26 +1,26 @@
 package pro.samgerstner.easyexchange.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import pro.samgerstner.easyexchange.S3Helper;
 import pro.samgerstner.easyexchange.entities.Document;
 import pro.samgerstner.easyexchange.entities.repositories.DocumentRepository;
+
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -101,20 +101,32 @@ public class DocumentController
       byte[] responseBody = s3.downloadSessionFile(doc.getUploadSession().getGuid(), doc.getFileName());
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.parseMediaType(doc.getFileType()));
+      headers.set("Content-Disposition", "attachment;filename=" + doc.getFileName());
       return new ResponseEntity<>(responseBody, headers, HttpStatus.OK);
    }
 
-   @GetMapping(value = "/puublic-download")
-   public ResponseEntity<byte[]> publicDownload(@RequestHeader Map<String, String> headers)
+   @GetMapping(value = "/public-download")
+   public ResponseEntity<byte[]> publicDownload(HttpSession session)
    {
-      //Verify required headers exist
-      if(!headers.containsKey("X-Document-GUID") || !headers.containsKey("X-Download-Nonce"))
+      //Get a list of session attributes
+      Enumeration<String> sessionAttributesRaw = session.getAttributeNames();
+      List<String> sessionAttributes = new ArrayList<String>();
+      while(sessionAttributesRaw.hasMoreElements())
       {
-         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+         sessionAttributes.add(sessionAttributesRaw.nextElement());
       }
 
+      //Verify required session attributes exist
+      if(!sessionAttributes.contains("X-Document-GUID") || !sessionAttributes.contains("X-Download-Nonce"))
+      {
+         System.out.println("Error: Missing required session attribute.");
+         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+      System.out.printf("\nX-Document-GUID: %s\nX-Download-Nonce: %s\n", session.getAttribute("X-Document-GUID").toString(),
+              session.getAttribute("X-Download-Nonce").toString());
+
       //Get document from the repo
-      Optional<Document> docOptional = docRepo.findById(headers.get("X-Document-GUID"));
+      Optional<Document> docOptional = docRepo.findById(session.getAttribute("X-Document-GUID").toString());
       if(docOptional.isEmpty())
       {
          return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -122,7 +134,7 @@ public class DocumentController
       Document doc = docOptional.get();
 
       //Verify the download nonce matches
-      if(!doc.getDownloadNonce().equals(headers.get("X-Download-Nonce")))
+      if(!doc.getDownloadNonce().equals(session.getAttribute("X-Download-Nonce").toString()))
       {
          return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
       }
@@ -131,6 +143,9 @@ public class DocumentController
       byte[] responseBody = s3.downloadSessionFile(doc.getUploadSession().getGuid(), doc.getFileName());
       HttpHeaders responseHeaders = new HttpHeaders();
       responseHeaders.setContentType(MediaType.parseMediaType(doc.getFileType()));
+      responseHeaders.set("Content-Disposition", "attachment;filename=" + doc.getFileName());
+      session.removeAttribute("X-Document-GUID");
+      session.removeAttribute("X-Download-Nonce");
       return new ResponseEntity<>(responseBody, responseHeaders, HttpStatus.OK);
    }
 }

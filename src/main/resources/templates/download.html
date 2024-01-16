@@ -8,8 +8,8 @@
     <body>
         <div th:replace="~{fragments/public_navigation.html}"></div>
         <h2>Download Document</h2>
-        <div class="alert alert-danger" role="alert" th:unless="${errorMsg.length() > 0}" th:text="${errorMsg}"></div>
-        <form action="#" th:action="@{/download}" th:object="${downloadReq}" method="post">
+        <div class="alert alert-danger" role="alert" th:if="${errorMsg.length() > 0}" th:text="${errorMsg}"></div>
+        <form action="#" th:action="@{/download}" th:object="${downloadReq}" method="post" target="_blank">
             <div class="form-group">
                 <label for="docGuid">Document GUID:</label>
                 <input type="text" id="docGuid" class="form-control" placeholder="Document GUID" th:field="*{docGUID}" th:value="${downloadReq.getDocGUID()}" required>

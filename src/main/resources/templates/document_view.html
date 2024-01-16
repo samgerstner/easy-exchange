@@ -50,7 +50,7 @@
         </thead>
         <tbody>
         <tr th:each="doc : ${docs}">
-          <th scope="row">[[${client.id}]]</th>
+          <th scope="row">[[${doc.guid}]]</th>
           <td>[[${doc.fileName}]]</td>
           <td>[[${doc.fileType}]]</td>
           <td>[[${doc.uploadSession.guid}]]</td>

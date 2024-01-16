@@ -1,6 +1,7 @@
 package pro.samgerstner.easyexchange.controllers;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -66,7 +67,7 @@ public class PublicController
    }
 
    @PostMapping(value = "download")
-   public String postDownload(@ModelAttribute DownloadRequest req, Model model, HttpServletResponse response)
+   public String postDownload(@ModelAttribute DownloadRequest req, Model model, HttpSession session)
    {
       //Verify that the document exists
       Optional<Document> docOptional = docRepo.findById(req.getDocGUID());
@@ -106,8 +107,8 @@ public class PublicController
          return "download";
       }
 
-      response.addHeader("X-Document-GUID", doc.getGuid());
-      response.addHeader("X-Download-Nonce", doc.getDownloadNonce());
+      session.setAttribute("X-Document-GUID", doc.getGuid());
+      session.setAttribute("X-Download-Nonce", doc.getDownloadNonce());
       return "redirect:/documents/public-download";
    }
 
@@ -157,13 +158,14 @@ public class PublicController
       }
 
       //Upload document to S3
+      System.out.println(req.getFile().getOriginalFilename());
       S3Helper s3 = new S3Helper(accessKey, secretKey, region, bucketName);
-      s3.uploadSessionFile(req.getSessionGUID(), req.getFile().getName(), req.getFile().getBytes());
+      s3.uploadSessionFile(req.getSessionGUID(), req.getFile().getOriginalFilename(), req.getFile().getBytes());
 
       //Build document object
       Document newDoc = new Document();
       newDoc.setGuid(UUID.randomUUID().toString());
-      newDoc.setFileName(req.getFile().getName());
+      newDoc.setFileName(req.getFile().getOriginalFilename());
       newDoc.setFileType(req.getFile().getContentType());
       newDoc.setUploadedAt(new SimpleDateFormat("MM-dd-yyyy HH:mm").format(new Date()));
       newDoc.setDownloadNonce(s3.generateDownloadNonce());
