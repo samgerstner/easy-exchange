@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:text="${appTitle} + ' | Delete Admin User'"></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link th:replace="~{fragments/dependencies.html}" />
+    </head>
+    <body>
+        <div th:replace="~{fragments/navigation.html}"></div>
+        <h2>Delete Admin User</h2>
+        <p th:text="'Are you sure that you want want to delete the following admin user: ' + ${user.username} + '. This action can not be un-done.'"></p>
+        <form action="#" th:action="@{'/admin-users/delete?id=' + ${user.id}}" method="post">
+            <div class="form-group">
+                <button type="submit" class="btn btn-danger">Delete User</button>
+                <a th:href="@{/admin-users/view}"><button type="button" class="btn btn-secondary">Cancel</button></a>
+            </div>
+        </form>
+    </body>
+</html>

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,6 +48,13 @@ public class PublicController
 
    @Value("${aws.bucket-name}")
    private String bucketName;
+
+   @GetMapping(value = {"/", "/home"})
+   public String home(Model model)
+   {
+      model.addAttribute("appTitle", title);
+      return "index";
+   }
 
    @GetMapping(value = "download")
    public String getDownload(Model model)
@@ -114,7 +122,7 @@ public class PublicController
    }
 
    @PostMapping(value = "/upload")
-   public String postUpload(@ModelAttribute UploadRequest req, Model model) throws IOException
+   public String postUpload(@ModelAttribute UploadRequest req, ModelMap model) throws IOException
    {
       //Verify session exists
       Optional<UploadSession> sessionOptional = sessionRepo.findById(req.getSessionGUID());
@@ -159,6 +167,7 @@ public class PublicController
       newDoc.setFileType(req.getFile().getContentType());
       newDoc.setUploadedAt(new SimpleDateFormat("MM-dd-yyyy HH:mm").format(new Date()));
       newDoc.setDownloadNonce(s3.generateDownloadNonce());
+      newDoc.setUploadSession(session);
       docRepo.save(newDoc);
 
       model.addAttribute("appTitle", title);

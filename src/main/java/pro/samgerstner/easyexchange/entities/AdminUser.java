@@ -2,6 +2,8 @@ package pro.samgerstner.easyexchange.entities;
 
 import jakarta.persistence.*;
 
+import java.util.Random;
+
 @Entity
 @Table(name = "admin_users")
 public class AdminUser
@@ -16,7 +18,7 @@ public class AdminUser
    @Column(name = "api_enabled", nullable = false)
    private boolean apiEnabled;
 
-   @Column(name = "api_key")
+   @Column(name = "api_key", unique = true)
    private String apiKey;
 
    @ManyToOne
@@ -80,5 +82,20 @@ public class AdminUser
    {
 
       this.userRole = userRole;
+   }
+
+   public void populateApiKey()
+   {
+      String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      StringBuilder builder = new StringBuilder();
+      Random random = new Random();
+
+      while(builder.length() < 64)
+      {
+         int index = (int) (random.nextFloat() * chars.length());
+         builder.append(chars.charAt(index));
+      }
+
+      this.apiKey = builder.toString();
    }
 }

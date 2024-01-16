@@ -104,7 +104,7 @@ public class UploadSessionController
 
    @GetMapping(value = "/view")
    public String view(@RequestParam(required = false) String search, @RequestParam(defaultValue = "1") int page,
-                      @RequestParam(defaultValue = "20") int size, @RequestParam(defaultValue = "id,asc") String[] sort,
+                      @RequestParam(defaultValue = "20") int size, @RequestParam(defaultValue = "guid,asc") String[] sort,
                       Model model)
    {
       model.addAttribute("appTitle", title);
