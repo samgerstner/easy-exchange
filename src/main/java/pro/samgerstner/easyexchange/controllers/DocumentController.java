@@ -11,9 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import pro.samgerstner.easyexchange.S3Helper;
 import pro.samgerstner.easyexchange.entities.Document;
 import pro.samgerstner.easyexchange.entities.repositories.DocumentRepository;
@@ -44,6 +42,12 @@ public class DocumentController
 
    @Value("${aws.bucket-name}")
    private String bucketName;
+
+   @ResponseStatus(HttpStatus.BAD_REQUEST)
+   public String badRequest()
+   {
+      return "Bad request";
+   }
 
    @GetMapping(value = "/view")
    public String view(@RequestParam(required = false) String search, @RequestParam(defaultValue = "1") int page,
@@ -147,5 +151,35 @@ public class DocumentController
       session.removeAttribute("X-Document-GUID");
       session.removeAttribute("X-Download-Nonce");
       return new ResponseEntity<>(responseBody, responseHeaders, HttpStatus.OK);
+   }
+
+   @GetMapping(value = "/delete")
+   public String getDelete(@RequestParam String guid, Model model)
+   {
+      Optional<Document> docOptional = docRepo.findById(guid);
+      if(docOptional.isEmpty())
+      {
+         return "redirect:/documents/bad-request";
+      }
+
+      model.addAttribute("appTitle", title);
+      model.addAttribute("doc", docOptional.get());
+      return "document_delete";
+   }
+
+   @PostMapping(value = "/delete")
+   public String postDelete(@RequestParam String guid)
+   {
+      Optional<Document> docOptional = docRepo.findById(guid);
+      if(docOptional.isEmpty())
+      {
+         return "redirect:/documents/bad-request";
+      }
+
+      Document doc = docOptional.get();
+      S3Helper s3 = new S3Helper(accessKey, secretKey, region, bucketName);
+      s3.deleteSessionFile(doc.getUploadSession().getGuid(), doc.getFileName());
+      docRepo.deleteById(guid);
+      return "redirect:/documents/view";
    }
 }

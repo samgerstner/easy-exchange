@@ -58,7 +58,9 @@
           <td>[[${doc.uploadSession.client.email}]]</td>
           <td>
             <a th:href="@{'/documents/admin-download?guid=' + ${doc.guid} + '&nonce=' + ${doc.downloadNonce}}" title="Download this document"
-               class="fa-regular fa-file-arrow-down icon-dark" target="_blank"></a>
+               class="fa-regular fa-file-arrow-down" target="_blank"></a>
+            <a th:href="@{'/documents/delete?guid=' + ${doc.guid}}" id="btnDelete"
+               title="Delete this document" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
           </td>
         </tr>
         </tbody>
