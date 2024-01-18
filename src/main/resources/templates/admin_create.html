@@ -9,11 +9,11 @@
     <div th:replace="~{fragments/navigation.html}"></div>
     <h2>Create New Admin User</h2>
     <form action="#" th:action="@{/admin-users/create}" th:object="${user}" method="post">
-      <div class="input-group">
+      <div class="form-floating">
         <label for="username" class="col-lg-1">Username:</label>
         <div class="col-lg-3"><input type="text" id="username" class="form-control" placeholder="Username/Unique Identifier" th:field="*{username}" required></div>
       </div>
-      <div class="input-group">
+      <div class="form-floating">
         <label for="role" class="col-lg-1">User Role:</label>
         <div class="col-lg-3"><select id="role" class="form-select" aria-label="Select Role" th:field="*{userRole}">
           <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.roleName}"></option>

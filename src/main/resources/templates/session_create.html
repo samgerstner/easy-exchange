@@ -9,7 +9,7 @@
         <div th:replace="~{fragments/navigation.html}"></div>
         <h2>Create New Upload Session</h2>
         <form action="#" th:action="@{/upload-sessions/create}" th:object="${us}" method="post">
-            <div class="input-group">
+            <div class="form-floating">
                 <label for="maxDocs" class="col-lg-1">Max Documents:</label>
                 <div class="col-lg-3"><input type="number" id="maxDocs" class="form-control" placeholder="Max Docs" th:field="*{maxDocuments}"  min="1" required></div>
             </div>
@@ -21,7 +21,7 @@
                 <input type="checkbox" class="form-check-input" id="downloadLocked" th:field="*{downloadLocked}">
                 <label class="form-check-label col-lg-1" for="downloadLocked">Download Locked</label>
             </div>
-            <div class="input-group">
+            <div class="form-floating">
                 <label for="clientID" class="col-lg-1">Client:</label>
                 <div class="col-lg-3"><select id="clientID" class="form-select" aria-label="Select Client" th:field="*{client}">
                     <option th:each="client : ${clients}" th:value="${client.id}" th:text="${client.firstName} +
