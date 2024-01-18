@@ -11,15 +11,12 @@ h2
     padding-top: .5em;
 }
 
-/* Add form padding */
 form
 {
     padding-left: 2em;
-    padding-top: 1em;
 }
 
-.input-group,
-.form-group
+form > div
 {
-    padding-top: 1.5em;
+    margin-top: 1.5em;
 }
