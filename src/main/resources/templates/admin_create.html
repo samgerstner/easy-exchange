@@ -8,20 +8,20 @@
   <body>
     <div th:replace="~{fragments/navigation.html}"></div>
     <h2>Create New Admin User</h2>
-    <form action="#" th:action="@{/admin-users/create}" th:object="${user}" method="post">
-      <div class="input-group">
-        <label for="username" class="col-lg-1">Username:</label>
-        <div class="col-lg-3"><input type="text" id="username" class="form-control" placeholder="Username/Unique Identifier" th:field="*{username}" required></div>
+    <form action="#" th:action="@{/admin-users/create}" th:object="${user}" method="post" class="form-floating">
+      <div class="form-floating col-lg-4">
+        <input type="text" id="username" class="form-control" placeholder="Username/Unique Identifier" th:field="*{username}" required>
+        <label for="username">Username</label>
       </div>
-      <div class="input-group">
-        <label for="role" class="col-lg-1">User Role:</label>
-        <div class="col-lg-3"><select id="role" class="form-select" aria-label="Select Role" th:field="*{userRole}">
+      <div class="form-floating col-lg-4">
+        <select id="role" class="form-select" aria-label="Select Role" th:field="*{userRole}">
           <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.roleName}"></option>
-        </select></div>
+        </select>
+        <label for="role">User Role</label>
       </div>
       <div class="form-check">
         <input type="checkbox" class="form-check-input" id="apiEnabled" th:field="*{apiEnabled}">
-        <label class="form-check-label col-lg-1" for="apiEnabled">API Access Enabled:</label>
+        <label class="form-check-label" for="apiEnabled">API Access Enabled</label>
       </div>
       <div class="form-group">
         <button type="submit" class="btn btn-primary">Submit</button>
