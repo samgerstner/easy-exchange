@@ -10,15 +10,15 @@
         <h2>Download Document</h2>
         <div class="alert alert-danger" role="alert" th:if="${errorMsg.length() > 0}" th:text="${errorMsg}"></div>
         <form action="#" th:action="@{/download}" th:object="${downloadReq}" method="post" target="_blank">
-            <div class="form-floating">
+            <div class="input-group">
                 <label for="docGuid" class="col-lg-1">Document GUID:</label>
                 <div class="col-lg-3"><input type="text" id="docGuid" class="form-control" placeholder="Document GUID" th:field="*{docGUID}" th:value="${downloadReq.getDocGUID()}" required></div>
             </div>
-            <div class="form-floating">
+            <div class="input-group">
                 <label for="sessionGuid" class="col-lg-1">Upload Session GUID:</label>
                 <div class="col-lg-3"><input type="text" id="sessionGuid" class="form-control" placeholder="Upload Session GUID" th:field="*{sessionGUID}" th:value="${downloadReq.getSessionGUID()}" required></div>
             </div>
-            <div class="form-floating">
+            <div class="input-group">
                 <label for="clientEmail" class="col-lg-1">Client Email:</label>
                 <div class="col-lg-3"><input type="email" id="clientEmail" class="form-control" placeholder="Client Email" th:field="*{clientEmail}" th:value="${downloadReq.getClientEmail()}" required></div>
             </div>
