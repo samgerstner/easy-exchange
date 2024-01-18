@@ -2,6 +2,7 @@ package pro.samgerstner.easyexchange.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ResolvableType;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -44,6 +45,15 @@ public class LoginController
    @Autowired
    private ApplicationRoleRepository roleRepo;
 
+   @Value("${application.admin-auto-create.enable}")
+   private boolean autoCreateEnabled;
+
+   @Value("${application.admin-auto-create.default-role}")
+   private String autoCreateRole;
+
+   @Value("${application.admin-auto-create.enable-api}")
+   private boolean autoCreateApi;
+
    @GetMapping(value = "/login")
    public String getLoginPage(Model model) {
       Iterable<ClientRegistration> clientRegistrations = null;
@@ -81,8 +91,15 @@ public class LoginController
          AdminUser newUser = new AdminUser();
          newUser.setUsername((String) userAttributes.get("email"));
          newUser.setUserRole(userRole);
-         newUser.setApiEnabled(true);
-         newUser.populateApiKey();
+         if(autoCreateApi)
+         {
+            newUser.setApiEnabled(true);
+            newUser.populateApiKey();
+         }
+         else
+         {
+            newUser.setApiEnabled(false);
+         }
          adminRepo.save(newUser);
       }
 
@@ -90,8 +107,21 @@ public class LoginController
       Optional<AdminUser> userOptional = adminRepo.findByUsername((String) userAttributes.get("email"));
       if(userOptional.isEmpty())
       {
-         session.setAttribute("uid", client.getClientRegistration().getClientId());
-         return "redirect:/admin-no-access";
+         if(autoCreateEnabled)
+         {
+            ApplicationRole userRole = roleRepo.findByName(autoCreateRole).get();
+            AdminUser newUser = new AdminUser();
+            newUser.setUsername((String) userAttributes.get("email"));
+            newUser.setUserRole(userRole);
+            newUser.setApiEnabled(true);
+            newUser.populateApiKey();
+            adminRepo.save(newUser);
+         }
+         else
+         {
+            session.setAttribute("uid", client.getClientRegistration().getClientId());
+            return "redirect:/admin-no-access";
+         }
       }
       AdminUser user = userOptional.get();
 
