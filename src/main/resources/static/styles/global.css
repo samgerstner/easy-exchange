@@ -1,0 +1,25 @@
+/* Add left padding to navigation title */
+nav:first-child
+{
+    padding-left: 1.5em;
+}
+
+/* Add some padding for headers */
+h2
+{
+    padding-left: .5em;
+    padding-top: .5em;
+}
+
+/* Add form padding */
+form
+{
+    padding-left: 2em;
+    padding-top: 1em;
+}
+
+.input-group,
+.form-group
+{
+    padding-top: 1.5em;
+}
