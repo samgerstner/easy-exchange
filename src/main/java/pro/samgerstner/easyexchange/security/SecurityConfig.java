@@ -15,6 +15,10 @@ public class SecurityConfig
    {
       http.authorizeHttpRequests()
               .requestMatchers("/login").permitAll()
+              .requestMatchers("/").permitAll()
+              .requestMatchers("/home").permitAll()
+              .requestMatchers("/download").permitAll()
+              .requestMatchers("/upload").permitAll()
               .requestMatchers("/api/**").permitAll()
               .anyRequest()
               .authenticated()
