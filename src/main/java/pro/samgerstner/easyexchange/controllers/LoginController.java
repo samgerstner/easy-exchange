@@ -3,6 +3,10 @@ package pro.samgerstner.easyexchange.controllers;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ResolvableType;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -11,10 +15,13 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.client.RestTemplate;
 import pro.samgerstner.easyexchange.entities.AdminUser;
 import pro.samgerstner.easyexchange.entities.ApplicationRole;
 import pro.samgerstner.easyexchange.entities.repositories.AdminUserRepository;
 import pro.samgerstner.easyexchange.entities.repositories.ApplicationRoleRepository;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -56,16 +63,23 @@ public class LoginController
    }
 
    @GetMapping(value = "/login-success")
-   public String loginSuccess(OAuth2AuthenticationToken auth, HttpSession session)
+   public String loginSuccess(OAuth2AuthenticationToken auth, HttpSession session) throws IOException
    {
       OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(auth.getAuthorizedClientRegistrationId(), auth.getName());
+      String userInfoEndpointUri = client.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri();
+      RestTemplate restTemplate = new RestTemplate();
+      HttpHeaders headers = new HttpHeaders();
+      headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + client.getAccessToken().getTokenValue());
+      HttpEntity entity = new HttpEntity("", headers);
+      ResponseEntity<Map> response = restTemplate.exchange(userInfoEndpointUri, HttpMethod.GET, entity, Map.class);
+      Map userAttributes = response.getBody();
 
       //Check if this is the first admin user
       if(adminRepo.findAllList().isEmpty())
       {
          ApplicationRole userRole = roleRepo.findByName("Super Admin").get();
          AdminUser newUser = new AdminUser();
-         newUser.setUsername(client.getClientRegistration().getClientId());
+         newUser.setUsername((String) userAttributes.get("email"));
          newUser.setUserRole(userRole);
          newUser.setApiEnabled(true);
          newUser.populateApiKey();
@@ -73,7 +87,7 @@ public class LoginController
       }
 
       //Check if an admin user exists for this uid
-      Optional<AdminUser> userOptional = adminRepo.findByUsername(client.getClientRegistration().getClientId());
+      Optional<AdminUser> userOptional = adminRepo.findByUsername((String) userAttributes.get("email"));
       if(userOptional.isEmpty())
       {
          session.setAttribute("uid", client.getClientRegistration().getClientId());
@@ -82,7 +96,7 @@ public class LoginController
       AdminUser user = userOptional.get();
 
       //Add uid and role as session variables
-      session.setAttribute("uid", client.getClientRegistration().getClientId());
+      session.setAttribute("uid", (String) userAttributes.get("email"));
       session.setAttribute("role", user.getUserRole().getRoleName());
 
       return "redirect:/admin-home";
