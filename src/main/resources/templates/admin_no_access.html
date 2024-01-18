@@ -1,0 +1,13 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:text="${appTitle} + ' | Admin Home'"></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link th:replace="~{fragments/dependencies.html}" />
+    </head>
+    <body>
+        <div th:replace="~{fragments/navigation.html}"></div>
+        <h2>Access Denied</h2>
+        <p>You do not have privileges to access this application. Please contact your administrator.</p>
+    </body>
+</html>

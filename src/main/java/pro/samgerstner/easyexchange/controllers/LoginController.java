@@ -54,6 +54,9 @@ public class LoginController
    @Value("${application.admin-auto-create.enable-api}")
    private boolean autoCreateApi;
 
+   @Value("${application.title}")
+   private String title;
+
    @GetMapping(value = "/login")
    public String getLoginPage(Model model) {
       Iterable<ClientRegistration> clientRegistrations = null;
@@ -130,5 +133,19 @@ public class LoginController
       session.setAttribute("role", user.getUserRole().getRoleName());
 
       return "redirect:/admin-home";
+   }
+
+   @GetMapping(value = "/admin-home")
+   public String adminHome(Model model)
+   {
+      model.addAttribute("appTitle", title);
+      return "admin_home";
+   }
+
+   @GetMapping(value = "/admin-no-access")
+   public String adminNoAccess(Model model)
+   {
+      model.addAttribute("appTitle", title);
+      return "admin_no_access";
    }
 }
