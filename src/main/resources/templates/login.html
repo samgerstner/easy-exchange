@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title th:text="${appTitle} + ' | Login'"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link th:replace="~{fragments/dependencies.html}" />
+  </head>
+  <body>
+    <div th:replace="~{fragments/navigation.html}"></div>
+    <h2>Please Login to Continue</h2>
+    <button class="btn btn-primary" th:action="${url.value}" th:each="url : ${urls}" th:text="Login - ${url.key}"
+            type="button">Client
+    </button>
+  </body>
+</html>

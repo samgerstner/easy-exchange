@@ -5,6 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import pro.samgerstner.easyexchange.entities.AdminUser;
+
+import java.util.List;
 import java.util.Optional;
 
 public interface AdminUserRepository extends CrudRepository<AdminUser, Integer>
@@ -16,4 +18,7 @@ public interface AdminUserRepository extends CrudRepository<AdminUser, Integer>
 
    @Query("select u from AdminUser u")
    Page<AdminUser> findAllPageable(Pageable pageable);
+
+   @Query("select u from AdminUser u")
+   List<AdminUser> findAllList();
 }
