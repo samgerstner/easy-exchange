@@ -12,7 +12,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import pro.samgerstner.easyexchange.AuthorizationHelper;
 import pro.samgerstner.easyexchange.S3Helper;
+import pro.samgerstner.easyexchange.entities.AuthorizationStatus;
 import pro.samgerstner.easyexchange.entities.Document;
 import pro.samgerstner.easyexchange.entities.repositories.DocumentRepository;
 
@@ -43,6 +45,8 @@ public class DocumentController
    @Value("${aws.bucket-name}")
    private String bucketName;
 
+   private final String[] allowedRoles = {"Administrator", "Super Admin"};
+
    @ResponseStatus(HttpStatus.BAD_REQUEST)
    public String badRequest()
    {
@@ -52,8 +56,12 @@ public class DocumentController
    @GetMapping(value = "/view")
    public String view(@RequestParam(required = false) String search, @RequestParam(defaultValue = "1") int page,
                       @RequestParam(defaultValue = "20") int size, @RequestParam(defaultValue = "guid,asc") String[] sort,
-                      Model model)
+                      Model model, HttpSession session)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       model.addAttribute("appTitle", title);
       String sortField = sort[0];
       String sortDirection = sort[1];
@@ -85,8 +93,13 @@ public class DocumentController
    }
 
    @GetMapping(value = "/admin-download")
-   public ResponseEntity<byte[]> adminDownload(@RequestParam String guid, @RequestParam String nonce)
+   public ResponseEntity<byte[]> adminDownload(HttpSession session, @RequestParam String guid, @RequestParam String nonce)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus, true) : null;
+      HttpHeaders authHeaders = new HttpHeaders();
+      authHeaders.add("Location", redirect);
+      if(redirect != null){ return new ResponseEntity<>(authHeaders, HttpStatus.OK); }
 
       Optional<Document> docOptional = docRepo.findById(guid);
       if(docOptional.isEmpty())
@@ -154,8 +167,12 @@ public class DocumentController
    }
 
    @GetMapping(value = "/delete")
-   public String getDelete(@RequestParam String guid, Model model)
+   public String getDelete(HttpSession session, @RequestParam String guid, Model model)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       Optional<Document> docOptional = docRepo.findById(guid);
       if(docOptional.isEmpty())
       {
@@ -168,8 +185,12 @@ public class DocumentController
    }
 
    @PostMapping(value = "/delete")
-   public String postDelete(@RequestParam String guid)
+   public String postDelete(HttpSession session, @RequestParam String guid)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       Optional<Document> docOptional = docRepo.findById(guid);
       if(docOptional.isEmpty())
       {

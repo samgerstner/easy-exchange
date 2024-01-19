@@ -1,5 +1,6 @@
 package pro.samgerstner.easyexchange.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -10,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import pro.samgerstner.easyexchange.AuthorizationHelper;
 import pro.samgerstner.easyexchange.entities.AdminUser;
+import pro.samgerstner.easyexchange.entities.AuthorizationStatus;
 import pro.samgerstner.easyexchange.entities.repositories.AdminUserRepository;
 import pro.samgerstner.easyexchange.entities.repositories.ApplicationRoleRepository;
 import java.util.List;
@@ -29,6 +32,8 @@ public class AdminUserController
    @Autowired
    private ApplicationRoleRepository roleRepo;
 
+   private final String[] allowedRoles = {"Super Admin"};
+
    @ResponseStatus(HttpStatus.BAD_REQUEST)
    public String badRequest()
    {
@@ -36,8 +41,12 @@ public class AdminUserController
    }
 
    @GetMapping(value = "/create")
-   public String getCreate(Model model)
+   public String getCreate(HttpSession session, Model model)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       model.addAttribute("appTitle", title);
       model.addAttribute("user", new AdminUser());
       model.addAttribute("roles", roleRepo.findAll());
@@ -46,8 +55,12 @@ public class AdminUserController
    }
 
    @PostMapping(value = "/create")
-   public String postCreate(@ModelAttribute AdminUser user, Model model)
+   public String postCreate(HttpSession session, @ModelAttribute AdminUser user, Model model)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       Optional<AdminUser> userOptional = adminRepo.findByUsername(user.getUsername());
       if(!userOptional.isEmpty())
       {
@@ -66,8 +79,12 @@ public class AdminUserController
    }
 
    @GetMapping(value = "/edit")
-   public String getEdit(@RequestParam int id,  Model model)
+   public String getEdit(HttpSession session, @RequestParam int id,  Model model)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       Optional<AdminUser> userOptional = adminRepo.findById(id);
 
       if(userOptional.isEmpty())
@@ -82,8 +99,12 @@ public class AdminUserController
    }
 
    @PostMapping(value = "/edit")
-   public String postEdit(@RequestParam int id,  @ModelAttribute AdminUser modifiedUser)
+   public String postEdit(HttpSession session, @RequestParam int id,  @ModelAttribute AdminUser modifiedUser)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       Optional<AdminUser> userOptional = adminRepo.findById(id);
 
       if(userOptional.isEmpty())
@@ -106,8 +127,12 @@ public class AdminUserController
    @GetMapping(value = "/view")
    public String view(@RequestParam(required = false) String search, @RequestParam(defaultValue = "1") int page,
                       @RequestParam(defaultValue = "20") int size, @RequestParam(defaultValue = "id,asc") String[] sort,
-                      Model model)
+                      Model model, HttpSession session)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       model.addAttribute("appTitle", title);
       String sortField = sort[0];
       String sortDirection = sort[1];
@@ -139,8 +164,12 @@ public class AdminUserController
    }
 
    @GetMapping(value = "/delete")
-   public String getDelete(@RequestParam int id, Model model)
+   public String getDelete(HttpSession session, @RequestParam int id, Model model)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       Optional<AdminUser> userOptional = adminRepo.findById(id);
 
       if(userOptional.isEmpty())
@@ -154,8 +183,12 @@ public class AdminUserController
    }
 
    @PostMapping(value = "/delete")
-   public String postDelete(@RequestParam int id)
+   public String postDelete(HttpSession session, @RequestParam int id)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       Optional<AdminUser> userOptional = adminRepo.findById(id);
 
       if(userOptional.isEmpty())

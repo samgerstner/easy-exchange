@@ -1,5 +1,6 @@
 package pro.samgerstner.easyexchange.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -10,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import pro.samgerstner.easyexchange.AuthorizationHelper;
 import pro.samgerstner.easyexchange.S3Helper;
+import pro.samgerstner.easyexchange.entities.AuthorizationStatus;
 import pro.samgerstner.easyexchange.entities.UploadSession;
 import pro.samgerstner.easyexchange.entities.repositories.ClientRepository;
 import pro.samgerstner.easyexchange.entities.repositories.UploadSessionRepository;
@@ -43,6 +46,8 @@ public class UploadSessionController
    @Value("${aws.bucket-name}")
    private String bucketName;
 
+   private final String[] allowedRoles = {"Session Manager", "Administrator", "Super Admin"};
+
    @ResponseStatus(HttpStatus.BAD_REQUEST)
    public String badRequest()
    {
@@ -50,8 +55,12 @@ public class UploadSessionController
    }
 
    @GetMapping(value = "/create")
-   public String getCreate(Model model)
+   public String getCreate(HttpSession session, Model model)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       model.addAttribute("appTitle", title);
       model.addAttribute("us", new UploadSession());
       model.addAttribute("clients", clientRepo.findAll());
@@ -59,8 +68,12 @@ public class UploadSessionController
    }
 
    @PostMapping(value = "/create")
-   public String postCreate(@ModelAttribute UploadSession session)
+   public String postCreate(HttpSession httpSession, @ModelAttribute UploadSession session)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(httpSession, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       session.setGuid(UUID.randomUUID().toString());
       S3Helper s3 = new S3Helper(accessKey, secretKey, region, bucketName);
       s3.createUploadSessionFolder(session.getGuid());
@@ -69,8 +82,12 @@ public class UploadSessionController
    }
 
    @GetMapping(value = "/edit")
-   public String getEdit(@RequestParam String guid, Model model)
+   public String getEdit(HttpSession session, @RequestParam String guid, Model model)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       Optional<UploadSession> sessionOptional = sessionRepo.findById(guid);
 
       if(sessionOptional.isEmpty())
@@ -85,8 +102,12 @@ public class UploadSessionController
    }
 
    @PostMapping(value = "/edit")
-   public String postEdit(@RequestParam String guid, @ModelAttribute UploadSession formSession)
+   public String postEdit(HttpSession httpSession, @RequestParam String guid, @ModelAttribute UploadSession formSession)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(httpSession, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       Optional<UploadSession> sessionOptional = sessionRepo.findById(guid);
 
       if(sessionOptional.isEmpty())
@@ -105,8 +126,12 @@ public class UploadSessionController
    @GetMapping(value = "/view")
    public String view(@RequestParam(required = false) String search, @RequestParam(defaultValue = "1") int page,
                       @RequestParam(defaultValue = "20") int size, @RequestParam(defaultValue = "guid,asc") String[] sort,
-                      Model model)
+                      Model model, HttpSession session)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       model.addAttribute("appTitle", title);
       String sortField = sort[0];
       String sortDirection = sort[1];
@@ -138,8 +163,12 @@ public class UploadSessionController
    }
 
    @GetMapping(value = "/delete")
-   public String getDelete(@RequestParam String guid, Model model)
+   public String getDelete(HttpSession session, @RequestParam String guid, Model model)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       Optional<UploadSession> clientOptional = sessionRepo.findById(guid);
 
       if(clientOptional.isEmpty())
@@ -153,8 +182,12 @@ public class UploadSessionController
    }
 
    @PostMapping(value = "/delete")
-   public String postDelete(@RequestParam String guid)
+   public String postDelete(HttpSession session, @RequestParam String guid)
    {
+      AuthorizationStatus authStatus = AuthorizationHelper.authorizeUserByRole(session, allowedRoles);
+      String redirect = authStatus != AuthorizationStatus.AUTHORIZED ? AuthorizationHelper.getAuthorizationRedirect(authStatus) : null;
+      if(redirect != null){ return redirect; }
+
       Optional<UploadSession> clientOptional = sessionRepo.findById(guid);
 
       if(clientOptional.isEmpty())

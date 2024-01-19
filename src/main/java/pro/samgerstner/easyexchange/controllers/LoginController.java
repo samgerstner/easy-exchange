@@ -4,10 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ResolvableType;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -147,5 +144,11 @@ public class LoginController
    {
       model.addAttribute("appTitle", title);
       return "admin_no_access";
+   }
+
+   @GetMapping(value = "/access-denied")
+   public ResponseEntity accessDenied()
+   {
+      return new ResponseEntity(HttpStatus.FORBIDDEN);
    }
 }
