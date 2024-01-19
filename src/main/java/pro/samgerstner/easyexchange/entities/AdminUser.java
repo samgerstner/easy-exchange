@@ -18,7 +18,7 @@ public class AdminUser
    @Column(name = "api_enabled", nullable = false)
    private boolean apiEnabled;
 
-   @Column(name = "api_key", unique = true)
+   @Column(name = "api_key")
    private String apiKey;
 
    @ManyToOne

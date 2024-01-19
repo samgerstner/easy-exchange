@@ -1,14 +1,20 @@
 package pro.samgerstner.easyexchange.helpers;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import pro.samgerstner.easyexchange.entities.AdminUser;
 import pro.samgerstner.easyexchange.entities.AuthorizationStatus;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
+import pro.samgerstner.easyexchange.entities.repositories.AdminUserRepository;
 
+import java.util.*;
+
+@Service
 public class AuthorizationHelper
 {
+   @Autowired
+   private AdminUserRepository adminRepo;
+
    public static AuthorizationStatus authorizeUserByRole(HttpSession session, String[] allowedRoles)
    {
       //Verify that user role session variable exists
@@ -47,5 +53,27 @@ public class AuthorizationHelper
       }
 
       return status == AuthorizationStatus.MISSING_SESSION_VAR ? "redirect:/oauth2/authorization/generic" : "redirect:/access-denied";
+   }
+
+   public AuthorizationStatus authorizeUserByApiKey(Map<String, String> headers)
+   {
+      if(!headers.containsKey("X-API-User") || !headers.containsKey("X-API-Key"))
+      {
+         return AuthorizationStatus.UNAUTHORIZED;
+      }
+
+      Optional<AdminUser> userOptional = adminRepo.findByUsername(headers.get("X-API-User"));
+      if(userOptional.isEmpty())
+      {
+         return AuthorizationStatus.UNAUTHORIZED;
+      }
+      AdminUser user = userOptional.get();
+
+      if(!user.getApiKey().equals(headers.get("X-API-Key")))
+      {
+         return AuthorizationStatus.UNAUTHORIZED;
+      }
+
+      return AuthorizationStatus.AUTHORIZED;
    }
 }
