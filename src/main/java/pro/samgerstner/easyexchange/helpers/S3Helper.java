@@ -1,4 +1,4 @@
-package pro.samgerstner.easyexchange;
+package pro.samgerstner.easyexchange.helpers;
 
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;

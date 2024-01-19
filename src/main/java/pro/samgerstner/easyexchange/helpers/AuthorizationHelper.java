@@ -1,4 +1,4 @@
-package pro.samgerstner.easyexchange;
+package pro.samgerstner.easyexchange.helpers;
 
 import jakarta.servlet.http.HttpSession;
 import pro.samgerstner.easyexchange.entities.AuthorizationStatus;
