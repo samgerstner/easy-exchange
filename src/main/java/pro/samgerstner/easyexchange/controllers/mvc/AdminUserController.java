@@ -1,4 +1,4 @@
-package pro.samgerstner.easyexchange.controllers;
+package pro.samgerstner.easyexchange.controllers.mvc;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
