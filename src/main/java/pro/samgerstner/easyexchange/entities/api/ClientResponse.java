@@ -16,4 +16,44 @@ public class ClientResponse
       this.timestamp = timestamp;
       this.client = client;
    }
+
+   public String getStatus()
+   {
+      return status;
+   }
+
+   public void setStatus(String status)
+   {
+      this.status = status;
+   }
+
+   public String getMessage()
+   {
+      return message;
+   }
+
+   public void setMessage(String message)
+   {
+      this.message = message;
+   }
+
+   public String getTimestamp()
+   {
+      return timestamp;
+   }
+
+   public void setTimestamp(String timestamp)
+   {
+      this.timestamp = timestamp;
+   }
+
+   public Client getClient()
+   {
+      return client;
+   }
+
+   public void setClient(Client client)
+   {
+      this.client = client;
+   }
 }
