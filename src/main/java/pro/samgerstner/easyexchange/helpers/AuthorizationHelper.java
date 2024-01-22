@@ -56,7 +56,7 @@ public class AuthorizationHelper
       return status == AuthorizationStatus.MISSING_SESSION_VAR ? "redirect:/oauth2/authorization/generic" : "redirect:/access-denied";
    }
 
-   public AuthorizationStatus authorizeUserByApiKey(Map<String, String> headers)
+   public AuthorizationStatus authorizeUserByApiKey(Map<String, String> headers, String[] allowedRoles)
    {
       if(!headers.containsKey("x-api-user") || !headers.containsKey("x-api-key"))
       {
@@ -71,6 +71,11 @@ public class AuthorizationHelper
       AdminUser user = userOptional.get();
 
       if(!user.getApiKey().equals(headers.get("x-api-key")))
+      {
+         return AuthorizationStatus.UNAUTHORIZED;
+      }
+
+      if(!Arrays.stream(allowedRoles).toList().contains(user.getUserRole().getRoleName()))
       {
          return AuthorizationStatus.UNAUTHORIZED;
       }

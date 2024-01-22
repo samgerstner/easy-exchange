@@ -25,10 +25,12 @@ public class ClientControllerApi
    @Autowired
    private AuthorizationHelper authHelper;
 
+   private final String[] allowedRoles = {"Client Manager", "Administrator", "Super Admin"};
+
    @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
    public ResponseEntity<?> create(@RequestHeader Map<String, String> headers, @RequestBody Client client)
    {
-      if(authHelper.authorizeUserByApiKey(headers) != AuthorizationStatus.AUTHORIZED)
+      if(authHelper.authorizeUserByApiKey(headers, allowedRoles) != AuthorizationStatus.AUTHORIZED)
       {
          return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
       }
@@ -53,7 +55,7 @@ public class ClientControllerApi
    @PostMapping(path = "/edit")
    public ResponseEntity<?> edit(@RequestHeader Map<String, String> headers, @RequestBody Client editClient)
    {
-      if(authHelper.authorizeUserByApiKey(headers) != AuthorizationStatus.AUTHORIZED)
+      if(authHelper.authorizeUserByApiKey(headers, allowedRoles) != AuthorizationStatus.AUTHORIZED)
       {
          return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
       }
@@ -77,7 +79,7 @@ public class ClientControllerApi
    @DeleteMapping(path = "/delete")
    public ResponseEntity<?> delete(@RequestHeader Map<String, String> headers, @RequestBody Client client)
    {
-      if(authHelper.authorizeUserByApiKey(headers) != AuthorizationStatus.AUTHORIZED)
+      if(authHelper.authorizeUserByApiKey(headers, allowedRoles) != AuthorizationStatus.AUTHORIZED)
       {
          return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
       }
