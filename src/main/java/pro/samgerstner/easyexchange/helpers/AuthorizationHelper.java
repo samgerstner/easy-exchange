@@ -2,14 +2,15 @@ package pro.samgerstner.easyexchange.helpers;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 import pro.samgerstner.easyexchange.entities.AdminUser;
 import pro.samgerstner.easyexchange.entities.AuthorizationStatus;
 import pro.samgerstner.easyexchange.entities.repositories.AdminUserRepository;
-
 import java.util.*;
 
 @Service
+@Configurable
 public class AuthorizationHelper
 {
    @Autowired
@@ -57,19 +58,19 @@ public class AuthorizationHelper
 
    public AuthorizationStatus authorizeUserByApiKey(Map<String, String> headers)
    {
-      if(!headers.containsKey("X-API-User") || !headers.containsKey("X-API-Key"))
+      if(!headers.containsKey("x-api-user") || !headers.containsKey("x-api-key"))
       {
          return AuthorizationStatus.UNAUTHORIZED;
       }
 
-      Optional<AdminUser> userOptional = adminRepo.findByUsername(headers.get("X-API-User"));
+      Optional<AdminUser> userOptional = adminRepo.findByUsername(headers.get("x-api-user"));
       if(userOptional.isEmpty())
       {
          return AuthorizationStatus.UNAUTHORIZED;
       }
       AdminUser user = userOptional.get();
 
-      if(!user.getApiKey().equals(headers.get("X-API-Key")))
+      if(!user.getApiKey().equals(headers.get("x-api-key")))
       {
          return AuthorizationStatus.UNAUTHORIZED;
       }

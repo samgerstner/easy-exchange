@@ -13,7 +13,8 @@ public class SecurityConfig
    @Bean
    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception
    {
-      http.authorizeHttpRequests()
+      http.csrf().disable()
+              .authorizeHttpRequests()
               .requestMatchers("/login").permitAll()
               .requestMatchers("/").permitAll()
               .requestMatchers("/home").permitAll()
