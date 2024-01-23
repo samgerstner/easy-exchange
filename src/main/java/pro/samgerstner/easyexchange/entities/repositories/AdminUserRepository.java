@@ -13,7 +13,7 @@ public interface AdminUserRepository extends CrudRepository<AdminUser, Integer>
 {
    Optional<AdminUser> findByUsername(String username);
 
-   @Query("select u from AdminUser u where u.username like '%?1%'")
+   @Query("select u from AdminUser u where u.username like %?1%")
    Page<AdminUser> findAllByUsername(String username, Pageable pageable);
 
    @Query("select u from AdminUser u")
