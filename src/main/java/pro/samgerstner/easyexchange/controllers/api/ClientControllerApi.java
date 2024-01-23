@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import pro.samgerstner.easyexchange.entities.AuthorizationStatus;
 import pro.samgerstner.easyexchange.entities.Client;
 import pro.samgerstner.easyexchange.entities.api.ClientResponse;
+import pro.samgerstner.easyexchange.entities.api.ClientSearchRequest;
+import pro.samgerstner.easyexchange.entities.api.ClientSearchResponse;
 import pro.samgerstner.easyexchange.entities.repositories.ClientRepository;
 import pro.samgerstner.easyexchange.helpers.AuthorizationHelper;
 import java.text.SimpleDateFormat;
@@ -16,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "/api/clients")
+@RequestMapping(path = "/api/clients", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ClientControllerApi
 {
    @Autowired
@@ -27,7 +29,7 @@ public class ClientControllerApi
 
    private final String[] allowedRoles = {"Client Manager", "Administrator", "Super Admin"};
 
-   @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
+   @PostMapping(path = "/create")
    public ResponseEntity<?> create(@RequestHeader Map<String, String> headers, @RequestBody Client client)
    {
       if(authHelper.authorizeUserByApiKey(headers, allowedRoles) != AuthorizationStatus.AUTHORIZED)
@@ -94,6 +96,26 @@ public class ClientControllerApi
       clientRepo.delete(clientReal);
       String timestamp = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(new Date());
       ClientResponse response = new ClientResponse("complete", "Successfully deleted client.", timestamp, clientReal);
+      return ResponseEntity.ok().body(response);
+   }
+
+   @GetMapping(path = "/search")
+   public ResponseEntity<?> search(@RequestHeader Map<String, String> headers, @RequestBody ClientSearchRequest req)
+   {
+      if(authHelper.authorizeUserByApiKey(headers, allowedRoles) != AuthorizationStatus.AUTHORIZED)
+      {
+         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      }
+
+      //Verify at least one search field was provided
+      if(req.getId() == 0 && req.getFirstName() == null && req.getLastName() == null && req.getEmail() == null)
+      {
+         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+
+      Client[] clients = clientRepo.findByFirstNameAndLastNameAndEmailAndId(req.getFirstName(), req.getLastName(), req.getEmail(), req.getId());
+      String timestamp = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(new Date());
+      ClientSearchResponse response = new ClientSearchResponse("", "", timestamp, clients);
       return ResponseEntity.ok().body(response);
    }
 }

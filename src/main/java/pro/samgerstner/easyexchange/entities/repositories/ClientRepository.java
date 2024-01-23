@@ -7,6 +7,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import pro.samgerstner.easyexchange.entities.Client;
 
+import java.util.List;
+
 public interface ClientRepository extends CrudRepository<Client, Integer>, PagingAndSortingRepository<Client, Integer>
 {
    @Query("select c from Client c where c.firstName like '%?1%' or c.lastName like '%?1%' or c.email like '%?1%'")
@@ -14,4 +16,7 @@ public interface ClientRepository extends CrudRepository<Client, Integer>, Pagin
 
    @Query("select c from Client c")
    Page<Client> findAllPageable(Pageable pageable);
+
+   @Query("select c from Client c where c.firstName like '%?1%' or c.lastName like '%?2%' or c.email like '%?3%' or c.id = ?4")
+   Client[] findByFirstNameAndLastNameAndEmailAndId(String firstName, String lastName, String email, int id);
 }
