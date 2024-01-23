@@ -13,12 +13,12 @@
         <input type="number" id="maxDocs" class="form-control" placeholder="Max Docs" th:field="*{maxDocuments}"  th:value="${us.maxDocuments}" min="1" required>
         <label for="maxDocs">Maximum Documents</label>
       </div>
-      <div class="form-check">
-        <input type="checkbox" class="form-check-input" id="uploadLocked" th:field="*{uploadLocked}" th:checked="${us.isUploadLocked()}">
+      <div class="form-check form-switch">
+        <input type="checkbox" class="form-check-input" role="switch" id="uploadLocked" th:field="*{uploadLocked}" th:checked="${us.isUploadLocked()}">
         <label class="form-check-label" for="uploadLocked">Upload Locked</label>
       </div>
-      <div class="form-check">
-        <input type="checkbox" class="form-check-input" id="downloadLocked" th:field="*{downloadLocked}" th:checked="${us.isDownloadLocked()}">
+      <div class="form-check form-switch">
+        <input type="checkbox" class="form-check-input" role="switch" id="downloadLocked" th:field="*{downloadLocked}" th:checked="${us.isDownloadLocked()}">
         <label class="form-check-label" for="downloadLocked">Download Locked</label>
       </div>
       <div class="form-floating col-lg-4">
