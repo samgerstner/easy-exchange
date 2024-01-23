@@ -115,7 +115,7 @@ public class ClientControllerApi
 
       Client[] clients = clientRepo.findByFirstNameAndLastNameAndEmailAndId(req.getFirstName(), req.getLastName(), req.getEmail(), req.getId());
       String timestamp = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(new Date());
-      ClientSearchResponse response = new ClientSearchResponse("", "", timestamp, clients);
+      ClientSearchResponse response = new ClientSearchResponse("complete", "Successfully searched clients.", timestamp, clients);
       return ResponseEntity.ok().body(response);
    }
 }
