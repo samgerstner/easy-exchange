@@ -10,7 +10,7 @@
     </parent>
     <groupId>pro.samgerstner</groupId>
     <artifactId>EasyExchange</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>EasyExchange</name>
     <description>EasyExchange</description>
     <properties>
