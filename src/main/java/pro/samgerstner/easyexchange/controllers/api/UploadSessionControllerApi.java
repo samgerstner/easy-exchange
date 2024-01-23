@@ -100,7 +100,7 @@ public class UploadSessionControllerApi
       return ResponseEntity.ok().body(response);
    }
 
-   @PostMapping(path = "/delete")
+   @DeleteMapping(path = "/delete")
    public ResponseEntity<?> delete(@RequestHeader Map<String, String> headers, @RequestBody UploadSession session)
    {
       if(authHelper.authorizeUserByApiKey(headers, allowedRoles) != AuthorizationStatus.AUTHORIZED)
