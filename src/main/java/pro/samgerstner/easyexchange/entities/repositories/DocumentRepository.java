@@ -14,4 +14,7 @@ public interface DocumentRepository extends CrudRepository<Document, String>, Pa
 
    @Query("select d from Document d")
    Page<Document> findAllPageable(Pageable pageable);
+
+   @Query("select d from Document d where d.guid like '%?1%' or d.uploadSession.guid like '%?2%' or d.uploadSession.client.email like '%?3%'")
+   Document[] findByGuidAndSessionGuidAndClientEmail(String guid, String sessionGuid, String clientEmail);
 }
