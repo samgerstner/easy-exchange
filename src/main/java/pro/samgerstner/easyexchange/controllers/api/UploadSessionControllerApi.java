@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/upload-sessions", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -53,6 +54,7 @@ public class UploadSessionControllerApi
       }
 
       UploadSession session = new UploadSession();
+      session.setGuid(UUID.randomUUID().toString());
       session.setMaxDocuments(req.getMaxDocuments());
       session.setUploadLocked(req.isUploadLocked());
       session.setDownloadLocked(req.isDownloadLocked());
@@ -115,6 +117,7 @@ public class UploadSessionControllerApi
       }
 
       UploadSession sessionReal = sessionOptional.get();
+      sessionRepo.delete(sessionReal);
       String timestamp = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(new Date());
       SessionResponse response = new SessionResponse("complete", "Successfully deleted upload session.", timestamp, sessionReal);
       return ResponseEntity.ok().body(response);

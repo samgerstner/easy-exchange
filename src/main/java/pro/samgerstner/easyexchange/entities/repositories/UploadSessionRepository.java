@@ -15,6 +15,6 @@ public interface UploadSessionRepository extends CrudRepository<UploadSession, S
    @Query("select s from UploadSession s")
    Page<UploadSession> findAllPageable(Pageable pageable);
 
-   @Query("select s from UploadSession s where s.guid like '%?1%' or s.client.email like '%?2%'")
+   @Query("select s from UploadSession s where s.guid like '%?1%' and s.client.email like '%?2%'")
    UploadSession[] findByGuidAndClientEmail(String guid, String clientEmail);
 }
